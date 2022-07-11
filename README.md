@@ -104,3 +104,9 @@ GROUP BY tmp.name
 ```
 
 Enjoy!
+
+
+##### generating GPG
+```
+mvn clean deploy -Dgpg.passphrase="myPassphrase" -Dgpg.keyname="key" -Prelease
+```
