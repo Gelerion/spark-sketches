@@ -11,13 +11,17 @@
         </license>
     </licenses>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>This library provides support for integrating Data Sketches into Spark</description>
+    <url>https://github.com/Gelerion/spark-sketches</url>
+
     <groupId>com.gelerion.spark.skecthes</groupId>
     <artifactId>spark-sketches</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.8.0</version>
 
     <properties>
         <spark.version>2.4.3</spark.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.11.12</scala.version>
         <java.version>1.8</java.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -118,10 +122,21 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -170,6 +185,8 @@
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
                                     </gpgArguments>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
                                 </configuration>
                             </execution>
                         </executions>
