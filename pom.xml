@@ -15,7 +15,7 @@
 
     <groupId>com.gelerion.spark.skecthes</groupId>
     <artifactId>spark-sketches</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.0-SNAPSHOT</version>
 
     <properties>
         <spark.version>2.4.3</spark.version>
@@ -148,10 +148,9 @@
 
     <scm>
         <connection>scm:git:git@github.com:Gelerion/spark-sketches.git</connection>
-        <developerConnection>scm:git:ssh://github.com:Gelerion/spark-sketches.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/Gelerion/spark-sketches.git</developerConnection>
         <url>https://github.com/Gelerion/spark-sketches/tree/master</url>
-      <tag>spark-sketches-0.8.0</tag>
-  </scm>
+     </scm>
 
     <profiles>
         <profile>
