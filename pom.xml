@@ -150,7 +150,8 @@
         <connection>scm:git:git@github.com:Gelerion/spark-sketches.git</connection>
         <developerConnection>scm:git:ssh://github.com:Gelerion/spark-sketches.git</developerConnection>
         <url>https://github.com/Gelerion/spark-sketches/tree/master</url>
-    </scm>
+      <tag>spark-sketches-0.8.0</tag>
+  </scm>
 
     <profiles>
         <profile>
@@ -184,6 +185,7 @@
                                     </gpgArguments>
                                     <keyname>${gpg.keyname}</keyname>
                                     <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                    <passphrase>${gpg.passphrase}</passphrase>
                                 </configuration>
                             </execution>
                         </executions>
@@ -200,6 +202,7 @@
                             <checkModificationExcludes>
                                 <checkModificationExclude>pom.xml</checkModificationExclude>
                             </checkModificationExcludes>
+                            <mavenExecutorId>forked-path</mavenExecutorId>
                         </configuration>
                     </plugin>
                 </plugins>
