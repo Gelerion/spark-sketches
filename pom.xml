@@ -147,8 +147,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:Gelerion/spark-sketches.git</connection>
-        <developerConnection>scm:git:git@github.com:Gelerion/spark-sketches.git</developerConnection>
+        <connection>scm:git@github.com:Gelerion/spark-sketches.git</connection>
+        <developerConnection>scm:git:git://github.com/Gelerion/spark-sketches.git</developerConnection>
         <url>https://github.com/Gelerion/spark-sketches/tree/master</url>
       <tag>spark-sketches-0.8.0</tag>
   </scm>
@@ -185,7 +185,6 @@
                                     </gpgArguments>
                                     <keyname>${gpg.keyname}</keyname>
                                     <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                                    <passphrase>${gpg.passphrase}</passphrase>
                                 </configuration>
                             </execution>
                         </executions>
