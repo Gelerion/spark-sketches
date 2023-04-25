@@ -201,7 +201,6 @@
                             <checkModificationExcludes>
                                 <checkModificationExclude>pom.xml</checkModificationExclude>
                             </checkModificationExcludes>
-                            <mavenExecutorId>forked-path</mavenExecutorId>
                         </configuration>
                     </plugin>
                 </plugins>
