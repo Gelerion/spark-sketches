@@ -1,9 +1,9 @@
 package com.gelerion.spark.skecthes.theta
 
 import com.gelerion.spark.skecthes.contract.TypedAggregationBuffer
-import com.yahoo.memory.{Memory, WritableMemory}
-import com.yahoo.sketches.{Family, ResizeFactor}
-import com.yahoo.sketches.theta.{SetOperation, Sketch, Sketches, Union, UpdateReturnState, UpdateSketch}
+import org.apache.datasketches.memory.{Memory, WritableMemory}
+import org.apache.datasketches.{Family, ResizeFactor}
+import org.apache.datasketches.theta.{SetOperation, Sketch, Sketches, Union, UpdateReturnState, UpdateSketch}
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.types.{SQLUserDefinedType, ThetaSketchType}
 
@@ -51,8 +51,8 @@ class ThetaSketch(sketch: Sketch) extends TypedAggregationBuffer[ThetaSketch] {
     //    Now it has to merge an in memory buffers with a new buffers created during sorting.
     //    (controlled by OBJECT_AGG_SORT_BASED_FALLBACK_THRESHOLD)
     if (!getSketch.isEmpty) { //slow path
-      getUnion.update(this.compact().getSketch)
-      getUnion.update(that.getSketch) //must always be compacted
+      getUnion.union(this.compact().getSketch)
+      getUnion.union(that.getSketch) //must always be compacted
 
       //return a new buffer with empty sketch and populated union
       val newBuffer = ThetaSketch()
@@ -62,7 +62,7 @@ class ThetaSketch(sketch: Sketch) extends TypedAggregationBuffer[ThetaSketch] {
     }
 
     //fast path
-    getUnion.update(that.getSketch)
+    getUnion.union(that.getSketch)
     this
   }
 
@@ -112,7 +112,7 @@ object ThetaSketch {
   private val familyByte: Int = 2
 
   def apply(bytes: Array[Byte]): ThetaSketch = {
-    val mem = WritableMemory.wrap(bytes)
+    val mem = WritableMemory.writableWrap(bytes)
     val familyId = extractFamilyByte(mem)
 
     Family.idToFamily(familyId) match {
