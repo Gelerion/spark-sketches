@@ -1,6 +1,6 @@
-package com.gelerion.spark.skecthes.hll
+package com.gelerion.spark.sketches.hll
 
-import com.gelerion.spark.skecthes.contract.TypedAggregationBuffer
+import com.gelerion.spark.sketches.contract.TypedAggregationBuffer
 import com.yahoo.memory.WritableMemory
 import com.yahoo.sketches.hll.{HllSketch, Union}
 import org.apache.spark.TaskContext

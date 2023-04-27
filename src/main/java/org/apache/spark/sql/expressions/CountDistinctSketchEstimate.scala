@@ -1,9 +1,9 @@
 package org.apache.spark.sql.expressions
 
-import com.gelerion.spark.skecthes.SketchType
-import com.gelerion.spark.skecthes.SketchType.{THETA, HLL}
-import com.gelerion.spark.skecthes.hll.HyperLogLogSketch
-import com.gelerion.spark.skecthes.theta.ThetaSketch
+import com.gelerion.spark.sketches.SketchType
+import com.gelerion.spark.sketches.SketchType.{THETA, HLL}
+import com.gelerion.spark.sketches.hll.HyperLogLogSketch
+import com.gelerion.spark.sketches.theta.ThetaSketch
 import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes, UnaryExpression}
 import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
 import org.apache.spark.sql.types.{AbstractDataType, DataType, HyperLogLogSketchType, LongType, ThetaSketchType}

@@ -1,6 +1,6 @@
 package org.apache.spark.sql.aggregates.hll
 
-import com.gelerion.spark.skecthes.hll.{HllSketchConfig, HyperLogLogSketch}
+import com.gelerion.spark.sketches.hll.{HllSketchConfig, HyperLogLogSketch}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}

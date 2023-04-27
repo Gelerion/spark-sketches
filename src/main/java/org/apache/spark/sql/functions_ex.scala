@@ -1,7 +1,7 @@
 package org.apache.spark.sql
 
-import com.gelerion.spark.skecthes.hll.HllSketchConfig
-import com.gelerion.spark.skecthes.theta.ThetaSketchConfig
+import com.gelerion.spark.sketches.hll.HllSketchConfig
+import com.gelerion.spark.sketches.theta.ThetaSketchConfig
 import org.apache.spark.sql.aggregates.hll.{HyperLogLogSketchBuildAggregate, HyperLogLogSketchMergeAggregate}
 import org.apache.spark.sql.aggregates.theta.{ThetaSketchBuildAggregate, ThetaSketchMergeAggregate}
 import org.apache.spark.sql.catalyst.expressions.Expression

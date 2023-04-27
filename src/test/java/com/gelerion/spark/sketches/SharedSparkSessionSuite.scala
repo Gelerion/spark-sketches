@@ -1,4 +1,4 @@
-package com.gelerion.spark.skecthes
+package com.gelerion.spark.sketches
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession

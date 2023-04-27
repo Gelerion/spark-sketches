@@ -1,4 +1,4 @@
-package com.gelerion.spark.skecthes
+package com.gelerion.spark.sketches
 
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.registrar.SketchFunctionsRegistrar
