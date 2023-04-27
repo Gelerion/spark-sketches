@@ -13,7 +13,7 @@
     <description>This library provides support for integrating Data Sketches into Spark</description>
     <url>https://github.com/Gelerion/spark-sketches</url>
 
-    <groupId>com.gelerion.spark.skecthes</groupId>
+    <groupId>com.gelerion.spark.sketches</groupId>
     <artifactId>spark-sketches</artifactId>
     <version>0.8.2-SNAPSHOT</version>
 
@@ -58,6 +58,7 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
         <extensions>
             <extension>
                 <groupId>org.kuali.maven.wagons</groupId>
@@ -120,6 +121,24 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--Fat jar-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
