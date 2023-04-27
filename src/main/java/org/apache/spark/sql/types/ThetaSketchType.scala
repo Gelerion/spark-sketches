@@ -1,6 +1,6 @@
 package org.apache.spark.sql.types
 
-import com.gelerion.spark.skecthes.theta.ThetaSketch
+import com.gelerion.spark.sketches.theta.ThetaSketch
 import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
 

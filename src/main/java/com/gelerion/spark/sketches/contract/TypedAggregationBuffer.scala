@@ -1,4 +1,4 @@
-package com.gelerion.spark.skecthes.contract
+package com.gelerion.spark.sketches.contract
 
 import org.apache.spark.internal.Logging
 

@@ -1,6 +1,6 @@
 package org.apache.spark.sql.types
 
-import com.gelerion.spark.skecthes.hll.HyperLogLogSketch
+import com.gelerion.spark.sketches.hll.HyperLogLogSketch
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
 

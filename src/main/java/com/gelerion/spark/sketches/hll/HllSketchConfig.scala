@@ -1,4 +1,4 @@
-package com.gelerion.spark.skecthes.hll
+package com.gelerion.spark.sketches.hll
 
 import com.yahoo.sketches.hll.{HllSketch, TgtHllType}
 

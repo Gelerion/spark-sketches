@@ -1,6 +1,6 @@
-package com.gelerion.spark.skecthes.theta
+package com.gelerion.spark.sketches.theta
 
-import com.gelerion.spark.skecthes.contract.TypedAggregationBuffer
+import com.gelerion.spark.sketches.contract.TypedAggregationBuffer
 import com.yahoo.memory.{Memory, WritableMemory}
 import com.yahoo.sketches.{Family, ResizeFactor}
 import com.yahoo.sketches.theta.{SetOperation, Sketch, Sketches, Union, UpdateReturnState, UpdateSketch}

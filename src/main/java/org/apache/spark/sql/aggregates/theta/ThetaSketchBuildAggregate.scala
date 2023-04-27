@@ -1,6 +1,6 @@
 package org.apache.spark.sql.aggregates.theta
 
-import com.gelerion.spark.skecthes.theta.{ThetaSketch, ThetaSketchConfig}
+import com.gelerion.spark.sketches.theta.{ThetaSketch, ThetaSketchConfig}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}

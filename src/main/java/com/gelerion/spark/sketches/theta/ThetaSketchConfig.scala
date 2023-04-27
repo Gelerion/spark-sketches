@@ -1,4 +1,4 @@
-package com.gelerion.spark.skecthes.theta
+package com.gelerion.spark.sketches.theta
 
 import com.yahoo.sketches.ResizeFactor
 
