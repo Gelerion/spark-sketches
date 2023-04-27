@@ -150,8 +150,8 @@
         <connection>scm:git:ssh://git@github.com/Gelerion/spark-sketches.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Gelerion/spark-sketches.git</developerConnection>
         <url>https://github.com/Gelerion/spark-sketches/tree/master</url>
-      <tag>0.8.2: Spark 2.4</tag>
-  </scm>
+        <tag>spark-sketches-0.8.2</tag>
+    </scm>
 
     <profiles>
         <profile>
