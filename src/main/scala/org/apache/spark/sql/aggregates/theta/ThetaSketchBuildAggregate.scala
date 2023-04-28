@@ -2,9 +2,10 @@ package org.apache.spark.sql.aggregates.theta
 
 import com.gelerion.spark.sketches.theta.{ThetaSketch, ThetaSketchConfig}
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes}
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}
-import org.apache.spark.sql.types.{DataType, NumericType, StringType, ThetaSketchType}
+import org.apache.spark.sql.catalyst.trees.UnaryLike
+import org.apache.spark.sql.types.{AbstractDataType, DataType, NumericType, StringType, ThetaSketchType}
 
 /**
  * config("spark.sql.execution.useObjectHashAggregateExec", "false")
@@ -14,7 +15,7 @@ case class ThetaSketchBuildAggregate(child: Expression,
                                      config: ThetaSketchConfig = ThetaSketchConfig(),
                                      override val mutableAggBufferOffset: Int = 0,
                                      override val inputAggBufferOffset: Int = 0)
-  extends TypedImperativeAggregate[ThetaSketch] {
+  extends TypedImperativeAggregate[ThetaSketch] with ImplicitCastInputTypes with UnaryLike[Expression] {
 
   //single expression constructor is mandatory for function to be used in SQL queries
   def this(child: Expression) = this(child, ThetaSketchConfig(), 0, 0)
@@ -59,7 +60,11 @@ case class ThetaSketchBuildAggregate(child: Expression,
 
   def dataType: DataType = ThetaSketchType
 
-  def children: Seq[Expression] = Seq(child)
-
   override def prettyName: String = "theta_sketch_build"
+
+  def inputTypes: Seq[AbstractDataType] = Seq(StringType, NumericType)
+
+  protected def withNewChildInternal(newChild: Expression): ThetaSketchBuildAggregate = {
+    copy(child = newChild)
+  }
 }

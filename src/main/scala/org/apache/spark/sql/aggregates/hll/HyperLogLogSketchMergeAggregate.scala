@@ -2,14 +2,15 @@ package org.apache.spark.sql.aggregates.hll
 
 import com.gelerion.spark.sketches.hll.HyperLogLogSketch
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes}
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}
-import org.apache.spark.sql.types.{DataType, HyperLogLogSketchType}
+import org.apache.spark.sql.catalyst.trees.UnaryLike
+import org.apache.spark.sql.types.{AbstractDataType, DataType, HyperLogLogSketchType}
 
 case class HyperLogLogSketchMergeAggregate(child: Expression,
                                            override val mutableAggBufferOffset: Int = 0,
                                            override val inputAggBufferOffset: Int = 0)
-  extends TypedImperativeAggregate[HyperLogLogSketch] {
+  extends TypedImperativeAggregate[HyperLogLogSketch] with ImplicitCastInputTypes with UnaryLike[Expression] {
 
   //single expression constructor is mandatory for function to be used in SQL queries
   def this(child: Expression) = this(child, 0, 0)
@@ -50,8 +51,12 @@ case class HyperLogLogSketchMergeAggregate(child: Expression,
 
   def dataType: DataType = HyperLogLogSketchType
 
-  def children: Seq[Expression] = Seq(child)
-
   override def prettyName: String = "hll_sketch_merge"
+
+  def inputTypes: Seq[AbstractDataType] = Seq(HyperLogLogSketchType)
+
+  protected def withNewChildInternal(newChild: Expression): HyperLogLogSketchMergeAggregate = {
+    copy(child = newChild)
+  }
 }
 
