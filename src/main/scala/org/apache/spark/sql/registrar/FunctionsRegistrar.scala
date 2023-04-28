@@ -10,6 +10,12 @@ import scala.util.{Failure, Success, Try}
 
 //based on org.apache.spark.sql.catalyst.analysis.FunctionRegistry
 trait FunctionsRegistrar {
+  /*
+  Aggregator<IN, BUF, OUT> agg = // custom Aggregator
+  Encoder<IN> enc = // input encoder
+  // register a UDF based on agg and enc   (JAVA compatible API)
+  spark.udf.register("myCustomAgg", functions.udaf(agg, enc))
+   */
   type FunctionBuilder = Seq[Expression] => Expression
 
   protected def expressions: Map[String, (ExpressionInfo, FunctionBuilder)]
@@ -39,12 +45,13 @@ trait FunctionsRegistrar {
     val builder = (expressions: Seq[Expression]) => {
       if (varargCtor.isDefined) {
         // If there is an apply method that accepts Seq[Expression], use that one.
-        Try(varargCtor.get.newInstance(expressions).asInstanceOf[Expression]) match {
-          case Success(e) => e
-          case Failure(e) =>
-            // the exception is an invocation exception. To get a meaningful message, we need the
-            // cause.
-            throw new AnalysisException(e.getCause.getMessage)
+        try {
+          val exp = varargCtor.get.newInstance(expressions).asInstanceOf[Expression]
+          exp
+        } catch {
+          // the exception is an invocation exception. To get a meaningful message, we need the
+          // cause.
+          case e: Exception => throw new AnalysisException(e.getCause.getMessage)
         }
       } else {
         // Otherwise, find a constructor method that matches the number of arguments, and use that.
@@ -53,21 +60,27 @@ trait FunctionsRegistrar {
           val validParametersCount = constructors
             .filter(_.getParameterTypes.forall(_ == classOf[Expression]))
             .map(_.getParameterCount).distinct.sorted
-          val expectedNumberOfParameters = if (validParametersCount.length == 1) {
-            validParametersCount.head.toString
+          val invalidArgumentsMsg = if (validParametersCount.length == 0) {
+            s"Invalid arguments for function $name"
           } else {
-            validParametersCount.init.mkString("one of ", ", ", " and ") +
-              validParametersCount.last
+            val expectedNumberOfParameters = if (validParametersCount.length == 1) {
+              validParametersCount.head.toString
+            } else {
+              validParametersCount.init.mkString("one of ", ", ", " and ") +
+                validParametersCount.last
+            }
+            s"Invalid number of arguments for function $name. " +
+              s"Expected: $expectedNumberOfParameters; Found: ${params.length}"
           }
-          throw new AnalysisException(s"Invalid number of arguments for function $name. " +
-            s"Expected: $expectedNumberOfParameters; Found: ${params.length}")
+          throw new AnalysisException(invalidArgumentsMsg)
         }
-        Try(f.newInstance(expressions: _*).asInstanceOf[Expression]) match {
-          case Success(e) => e
-          case Failure(e) =>
-            // the exception is an invocation exception. To get a meaningful message, we need the
-            // cause.
-            throw new AnalysisException(e.getCause.getMessage)
+        try {
+          val exp = f.newInstance(expressions: _*).asInstanceOf[Expression]
+          exp
+        } catch {
+          // the exception is an invocation exception. To get a meaningful message, we need the
+          // cause.
+          case e: Exception => throw new AnalysisException(e.getCause.getMessage)
         }
       }
     }
@@ -78,7 +91,7 @@ trait FunctionsRegistrar {
   /**
    * Creates an ExpressionInfo for the function as defined by expression T using the given name.
    */
-  protected def expressionInfo[T <: Expression : ClassTag](name: String): ExpressionInfo = {
+  private def expressionInfo[T <: Expression : ClassTag](name: String): ExpressionInfo = {
     val clazz = scala.reflect.classTag[T].runtimeClass
     val df = clazz.getAnnotation(classOf[ExpressionDescription])
     if (df != null) {
@@ -91,7 +104,9 @@ trait FunctionsRegistrar {
           df.arguments(),
           df.examples(),
           df.note(),
-          df.since())
+          df.group(),
+          df.since(),
+          df.deprecated())
       } else {
         // This exists for the backward compatibility with old `ExpressionDescription`s defining
         // the extended description in `extended()`.

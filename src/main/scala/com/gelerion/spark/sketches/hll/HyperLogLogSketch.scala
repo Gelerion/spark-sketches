@@ -1,8 +1,8 @@
 package com.gelerion.spark.sketches.hll
 
 import com.gelerion.spark.sketches.contract.TypedAggregationBuffer
-import com.yahoo.memory.WritableMemory
-import com.yahoo.sketches.hll.{HllSketch, Union}
+import org.apache.datasketches.memory.WritableMemory
+import org.apache.datasketches.hll.{HllSketch, Union}
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.types.{HyperLogLogSketchType, SQLUserDefinedType}
 
@@ -79,7 +79,7 @@ object HyperLogLogSketch {
   def apply(config: HllSketchConfig): HyperLogLogSketch = new HyperLogLogSketch(new HllSketch(config.lgConfigK, config.tgtHllType))
 
   def apply(bytes: Array[Byte]): HyperLogLogSketch = {
-    val mem = WritableMemory.wrap(bytes)
+    val mem = WritableMemory.writableWrap(bytes)
     new HyperLogLogSketch(HllSketch.wrap(mem))
   }
 }
