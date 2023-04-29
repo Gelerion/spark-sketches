@@ -4,6 +4,7 @@ import org.apache.spark.sql.aggregates.hll.{HyperLogLogSketchBuildAggregate, Hyp
 import org.apache.spark.sql.aggregates.theta.{ThetaSketchBuildAggregate, ThetaSketchMergeAggregate}
 import org.apache.spark.sql.catalyst.expressions.ExpressionInfo
 import org.apache.spark.sql.expressions.{CountDistinctHllSketchEstimate, CountDistinctThetaSketchEstimate}
+import org.apache.spark.sql.catalyst.analysis.FunctionRegistry.FunctionBuilder
 
 object SketchFunctionsRegistrar extends FunctionsRegistrar {
   override protected def expressions: Map[String, (ExpressionInfo, FunctionBuilder)] = Map(

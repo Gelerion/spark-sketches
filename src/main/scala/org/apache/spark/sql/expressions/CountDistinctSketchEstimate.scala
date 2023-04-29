@@ -8,7 +8,7 @@ import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputT
 import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
 import org.apache.spark.sql.types.{AbstractDataType, DataType, HyperLogLogSketchType, LongType, ThetaSketchType}
 
-abstract class CountDistinctSketchEstimate extends UnaryExpression
+abstract class CountDistinctSketchEstimate() extends UnaryExpression
   with ImplicitCastInputTypes
   with Serializable {
 
@@ -54,8 +54,14 @@ abstract class CountDistinctSketchEstimate extends UnaryExpression
 
 case class CountDistinctHllSketchEstimate(child: Expression) extends CountDistinctSketchEstimate {
   override val sketch: SketchType.Value = SketchType.HLL
+
+  override protected def withNewChildInternal(newChild: Expression): CountDistinctHllSketchEstimate =
+    copy(child = newChild)
 }
 
 case class CountDistinctThetaSketchEstimate(child: Expression) extends CountDistinctSketchEstimate {
   override val sketch: SketchType.Value = SketchType.THETA
+
+  override protected def withNewChildInternal(newChild: Expression): CountDistinctThetaSketchEstimate =
+    copy(child = newChild)
 }

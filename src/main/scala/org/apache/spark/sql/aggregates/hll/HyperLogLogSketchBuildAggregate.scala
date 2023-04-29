@@ -2,15 +2,16 @@ package org.apache.spark.sql.aggregates.hll
 
 import com.gelerion.spark.sketches.hll.{HllSketchConfig, HyperLogLogSketch}
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes}
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}
-import org.apache.spark.sql.types.{DataType, HyperLogLogSketchType, NumericType, StringType}
+import org.apache.spark.sql.catalyst.trees.UnaryLike
+import org.apache.spark.sql.types.{AbstractDataType, DataType, HyperLogLogSketchType, NumericType, StringType}
 
 case class HyperLogLogSketchBuildAggregate(child: Expression,
                                            config: HllSketchConfig = HllSketchConfig(),
                                            override val mutableAggBufferOffset: Int = 0,
                                            override val inputAggBufferOffset: Int = 0)
-  extends TypedImperativeAggregate[HyperLogLogSketch] {
+  extends TypedImperativeAggregate[HyperLogLogSketch] with ImplicitCastInputTypes with UnaryLike[Expression] {
 
   //single expression constructor is mandatory for function to be used in SQL queries
   def this(child: Expression) = this(child, HllSketchConfig(), 0, 0)
@@ -55,8 +56,11 @@ case class HyperLogLogSketchBuildAggregate(child: Expression,
 
   def dataType: DataType = HyperLogLogSketchType
 
-  def children: Seq[Expression] = Seq(child)
-
   override def prettyName: String = "hll_sketch_build"
 
+  def inputTypes: Seq[AbstractDataType] = Seq(StringType, NumericType)
+
+  override protected def withNewChildInternal(newChild: Expression): HyperLogLogSketchBuildAggregate = {
+    copy(child = newChild)
+  }
 }
