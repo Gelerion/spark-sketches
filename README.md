@@ -18,8 +18,6 @@ Currently two types of sketches are supported:
   Because set expressions are so powerful from an analysis point-of-view, many users  
   choose the Theta Sketch in spite of its larger size.
 
-It was fully test with Spark `2.4.3` and Scala `2.11.8`
-
 - Type safety with User defined types (propagated to the parquet metadata)
 - Code generation
 - High performance aggregations using TypedImperativeAggregate
