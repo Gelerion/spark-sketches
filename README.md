@@ -1,110 +1,96 @@
 # Overview
-The aim is to integrate the [DataSketches](https://datasketches.apache.org/) library seamlessly
-into Spark and use all the advantages of approximate algorithms.   
-The project contains a set of functions that are indistinguishable from the native ones. 
-They are available in both forms - as a Spark function or as a SQL function.
-No more `.toRdd` casts or error-prone `map`, `mapPartition`, etc. methods.
-
-Currently two types of sketches are supported:  
-- `HyoerLogLog Sketch`  
-  HLL sketches are smaller in size because of the nature of the underlying HLL algorithm.  
-  However, the HLL algorithm is not designed to allow Intersections. If the use-case  
-  for counting uniques only requires merging and does not require Intersection operations  
-  then the HLL algorithm is a reasonable choice.
+The goal of this project is to seamlessly integrate probabilistic algorithms, in the form of the
+[DataSketches](https://datasketches.apache.org/) into [Spark](https://spark.apache.org/). This can be an excellent 
+solution for both real-time analytics and incremental historical data updates, as long as the results can tolerate 
+slight inaccuracies (which have mathematically proven error bounds).
   
-- `Theta Sketch`  
-  The Theta Sketch from the DS library is a larger sketch, but it is designed from    
-  the outset to enable set Intersection and set difference operations.  
-  Because set expressions are so powerful from an analysis point-of-view, many users  
-  choose the Theta Sketch in spite of its larger size.
+The project currently supports two types of sketches:
+-   **HyperLogLog Sketch**: It is usually smaller in size due to the underlying implementation. However, this family does not support intersection operations.
+-   **Theta Sketch**: It is usually a bit larger than the HLL Sketch, but it supports intersection and difference operations.
 
-- Type safety with User defined types (propagated to the parquet metadata)
-- Code generation
-- High performance aggregations using TypedImperativeAggregate
+# Highlights
 
-Usage exmaple
-- Real time count-distinc analytics (over-time)
-- History update
+-   Supports all versions of Spark from 2.4 to 3.4+
+-   Provides a set of functions that are identical to the native ones, eliminating the need for `.toRdd` casts or error-prone methods such as `map`, `mapPartition`, etc.
+-   Easy to use with both `SQL` and `DataFrame`/`Dataset` APIs
+-   Type safety with user-defined types
+-   Code generation
+-   High-performance aggregations leveraging `TypedImperativeAggregate`.
 
-# Examples
-- Build sketch example
-Scala  
+# Get it!
+
+## Maven
+```xml
+<dependency> 
+ <groupId>com.gelerion.spark.sketches</groupId> 
+ <artifactId>spark-sketches</artifactId> 
+ <version>1.0.0</version> 
+</dependency>
 ```
-import org.apache.spark.sql.functions_ex._
+#### Versions compatibility Matrix
+| Project version | Scala | Spark          |
+|-----------------|-------|----------------|
+| 1.0.0           | 2.12  | 3.3.x -> 3.x.x |
+| 0.9.0           | 2.12  | 3.0.x -> 3.2.x |
+| 0.8.2           | 2.11  | 2.4.3          |
 
+  
+# Use It!
+
+## In SQL
+First, register the functions. This only needs to be done once.
+```scala
+import org.apache.spark.sql.registrar
+
+SketchFunctionsRegistrar.registerFunctions(spark)
+```
+#### Aggregating
+The sketch will be created in the form of `raw bytes`. This allows us to save it into a file and recreate
+the sketch after loading it. Alternatively, we can feed these files to our real-time analytic layer, such as Druid.
+```sql
+SELECT dimension_1, dimension_2, theta_sketch_build(metric)
+      FROM table
+      GROUP BY dimension_1, dimension_2
+```
+#### Merging sketches
+One of the most fascinating features about the sketches is that they are mergeable.
+The function takes other sketch as an input.
+```sql
+SELECT dim_1, theta_sketch_merge(sketch)
+      FROM table
+      GROUP BY dimension_1
+```
+#### Getting results
+```sql
+SELECT theta_sketch_get_estimate(sketch) FROM table
+```
+  
+## In Scala
+First, import the functions.
+```scala
+import org.apache.spark.sql.functions_ex._
+```
+#### Aggregating
+```scala
 df.groupBy($"dimension")
   .agg(theta_sketch_build($"metric"))
-
-// or
-
+```
+#### Merging sketches
+```scala
 df.groupBy($"dimension")
-  .agg(hll_sketch_build($"metric"))
+  .agg(theta_sketch_merge($"sketch"))
 ```
-  
-SQL  
-```
-SketchFunctionsRegistrar.registerFunctions(spark)
-```
-```
-SELECT theta_sketch_build(metric), hll_sketch_build(metric) 
-      FROM dataset
-      GROUP BY dimension
+#### Getting results
+```scala
+df.select(theta_sketch_get_estimate($"sketch"))
 ```
 
-The sketch will be created in the form of `raw bytes` thus letting us save it into a file and recreate the sketch  
-after loading it. Or let us feed these files to our real-time analytic layer like Druid.
-
-- Merge sketches example  
-  
-One of the most fascinating features about the sketches is that they are mergeable.  
-This is extremely useful when  
-
-Merge sketch example:
-```
-import org.apache.spark.sql.functions_ex._
-
-spark.createDataset(data)
-      .groupBy($"name", $"age")
-      .agg(hll_sketch_build($"id").as("distinct_ids_sketch"))
-      // drop dimension, merge sketches
-      .groupBy($"name")
-      .agg(hll_sketch_merge("distinct_ids_sketch").as("distinct_ids_sketch"))
-      
-// or
-
-spark.createDataset(data)
-      .groupBy($"name", $"age")
-      .agg(theta_sketch_build($"id").as("distinct_ids_sketch"))
-      // drop dimension, merge sketches
-      .groupBy($"name")
-      .agg(theta_sketch_merge("distinct_ids_sketch").as("distinct_ids_sketch"))
-```
-
-Evaluate sketch example:
-```
-import org.apache.spark.sql.functions_ex._
-
-df.select($"dimension", theta_sketch_get_estimate($"sketch_metric").as("approx_count_distinct"))
-// or
-df.select($"dimension", hll_sketch_get_estimate($"sketch_metric").as("approx_count_distinct"))
-```
-
-#### Using SQL
-```
-SketchFunctionsRegistrar.registerFunctions(spark)
-```
-```
-SELECT tmp.name, theta_sketch_get_estimate(theta_sketch_merge(tmp.distinct_ids_sketch)) as approx_count_distinct
-FROM (SELECT name, age, theta_sketch_build(id) as distinct_ids_sketch
-      FROM users_theta
-      GROUP BY name, age) as tmp
-GROUP BY tmp.name
-```
-
-Enjoy!
-
-
-##### generating GPG
-```
-mvn clean deploy -Dgpg.passphrase="myPassphrase" -Dgpg.keyname="key" -Prelease
-```
+### Available functions
+- Theta sketch
+  - theta_sketch_build
+  - theta_sketch_merge
+  - theta_sketch_get_estimate
+- HLL sketch
+  - hll_sketch_build
+  - hll_sketch_merge
+  - hll_sketch_get_estimate
